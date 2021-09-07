@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import Functions.Query as Query
-from Functions.Leg_selection import select_put_leg, leg_pnl_cal, pnl_cal, stop_loss, odds_calc
+from Functions.Leg_selection import select_call_leg, select_put_leg, leg_pnl_cal, pnl_cal, stop_loss, odds_calc
 import pandas_market_calendars as mcal
 import numpy as np
 
@@ -14,7 +14,7 @@ number_of_trades = 1
 
 
 stock_price = Query.get_underlying_price(ticker, start_date, end_date).reset_index(drop=False)
-stock_price['close'] = stock_price['close']*10
+stock_price['close'] = stock_price['close']
 option_price = Query.get_option_price(start_date, 7, 'options_history_spx')
 option_price['strike_distance'] = option_price['stkpx'] - option_price['strike']
 
@@ -27,23 +27,42 @@ options_7dte = options_7dte[options_7dte['expirday'].isin([1, 3, 5])].reset_inde
 put_options_short_legs = select_put_leg(options_7dte, select_param='delta', select_val=.1, side='short')
 put_options_long_legs = select_put_leg(options_7dte, select_param='delta', select_val=.06,  side='long')
 
+call_options_short_legs = select_call_leg(options_7dte, select_param='delta', select_val=.1, side='short')
+call_options_long_legs = select_call_leg(options_7dte, select_param='delta', select_val=.06,  side='long')
 # leg pnl calc
 short_put_leg_pnl_trimmed = leg_pnl_cal(put_options_short_legs, option_price, option_type='put', side='short')
 long_put_leg_pnl_trimmed = leg_pnl_cal(put_options_long_legs, option_price, option_type='put', side='long')
-
+short_call_leg_pnl_trimmed = leg_pnl_cal(call_options_short_legs, option_price, option_type='call', side='short')
+long_call_leg_pnl_trimmed = leg_pnl_cal(call_options_long_legs, option_price, option_type='call', side='long')
 
 isNaked = False
 PnL_final_put = pnl_cal(short_put_leg_pnl_trimmed, long_put_leg_pnl_trimmed, option_type='put', naked=isNaked)
+PnL_final_call = pnl_cal(short_call_leg_pnl_trimmed, long_call_leg_pnl_trimmed, option_type='call', naked=isNaked)
 # Stop loss and max loss criteria
 PnL_final_put_with_stop_loss, stop_loss_occurrences_put = stop_loss(PnL_final_put, stop_crit=3, naked=isNaked)
+PnL_final_call_with_stop_loss, stop_loss_occurrences_call = stop_loss(PnL_final_call, stop_crit=3, naked=isNaked)
 
 # PnL_final_put_with_stop_loss.sort_values(by=['ticker','trade_date', 'expirdate'], inplace=True)
 
 odds_put, win_rate_put, year_end_pnl_max_drawdown_put = odds_calc(PnL_final_put_with_stop_loss)
+odds_call, win_rate_call, year_end_pnl_max_drawdown_call = odds_calc(PnL_final_call_with_stop_loss)
 
+odds_total = pd.merge(odds_put[['ticker', 'trade_date', 'expirdate', 'pnl_approx', 'cumulative_pnl']].rename(columns={'pnl_approx':'pnl_approx_put','cumulative_pnl':'cumulative_pnl_put'}),
+                      odds_call[['ticker', 'trade_date', 'expirdate', 'pnl_approx', 'cumulative_pnl']].rename(columns={'pnl_approx':'pnl_approx_call','cumulative_pnl':'cumulative_pnl_call'}),
+                      on=['ticker', 'trade_date', 'expirdate'], how='left')
+odds_total['pnl_approx_call'] = odds_total['pnl_approx_call'].fillna(0)
+odds_total['cumulative_pnl_call'] = odds_total['cumulative_pnl_call'].fillna(method='ffill')
+
+odds_total['cumulative_pnl'] = odds_total['cumulative_pnl_put'] + odds_total['cumulative_pnl_call']
+odds_total['pnl_approx'] = odds_total['pnl_approx_put'] + odds_total['pnl_approx_call']
+odds_total['Win'] = odds_total['pnl_approx'] > 0
+odds_total['losing trade'] = (1-odds_total['Win'])*odds_total['cumulative_pnl']
+losing_trade_total = odds_total[odds_total['Win']== False].reset_index(drop=True)
 # Buying Power Effect
 PnL_final_put_with_stop_loss = PnL_final_put_with_stop_loss[(PnL_final_put_with_stop_loss['days_to_expir'] != 7)].sort_values(by=['trade_date', 'short_date_transact'])
 bpe_analysis_put = PnL_final_put_with_stop_loss.groupby(['ticker', 'trade_date'])['BPE'].agg(['sum', 'count']).reset_index(drop=False)
+PnL_final_call_with_stop_loss = PnL_final_call_with_stop_loss[(PnL_final_call_with_stop_loss['days_to_expir'] != 7)].sort_values(by=['trade_date', 'short_date_transact'])
+bpe_analysis_call = PnL_final_call_with_stop_loss.groupby(['ticker', 'trade_date'])['BPE'].agg(['sum', 'count']).reset_index(drop=False)
 
 # odds.to_csv('SPY 7DTE 20-10Delta Put Spread 3X.csv')
 # bpe_analysis.to_csv('SPY 20-10DTEDelta Put Spread 3X BPE.csv')
@@ -53,8 +72,11 @@ stock_price['pnl'] = (stock_price.close - stock_price.close.values[0])*100
 # # fig, ax = plt.subplots(figsize=(15,8))
 odds_put['losing trade'] = (1-odds_put['Win'])*odds_put['cumulative_pnl']
 losing_trade_put = odds_put[odds_put['Win']== False].reset_index(drop=True)
+odds_call['losing trade'] = (1-odds_call['Win'])*odds_call['cumulative_pnl']
+losing_trade_call = odds_call[odds_call['Win']== False].reset_index(drop=True)
 
 bpe_losing_put = pd.merge(losing_trade_put[['ticker', 'trade_date', 'Win']], bpe_analysis_put, on=['ticker', 'trade_date'], how='left')
+bpe_losing_call = pd.merge(losing_trade_call[['ticker', 'trade_date', 'Win']], bpe_analysis_call, on=['ticker', 'trade_date'], how='left')
 
 nyse = mcal.get_calendar('NYSE')
 holidays = pd.DataFrame(nyse.holidays().holidays, columns=['holidays'])
@@ -72,11 +94,19 @@ ax1.plot(pd.to_datetime(stock_price['Date']), stock_price['pnl'], 'b')
 ax1.plot(pd.to_datetime(odds_put['trade_date']), number_of_trades*odds_put['cumulative_pnl'] * 100, 'g')
 ax1.plot(pd.to_datetime(losing_trade_put['trade_date']), number_of_trades*losing_trade_put['cumulative_pnl'] * 100, '.r', markersize=10)
 
+# ax1.plot(pd.to_datetime(odds_call['trade_date']), number_of_trades*odds_call['cumulative_pnl'] * 100, 'c', markersize=5)
+# ax1.plot(pd.to_datetime(losing_trade_call['trade_date']), number_of_trades*losing_trade_call['cumulative_pnl'] * 100, '.c', markersize=10)
+
+# ax1.plot(pd.to_datetime(odds_total['trade_date']), number_of_trades*(odds_total['cumulative_pnl']) * 100, 'k', markersize=5)
+# ax1.plot(pd.to_datetime(losing_trade_total['trade_date']), number_of_trades*losing_trade_total['cumulative_pnl'] * 100, '.r', markersize=10)
 ax1.spines['right'].set_visible(False)
 ax1.spines['top'].set_visible(False)
-plt.title(ticker+' pnl, number of option trades = ' + str(len(odds_put)) + ', win rate = ' + "{0:.2f}%".format((1-len(stop_loss_occurrences_put)/len(odds_put))*100)+',' +"{0:.2f}%".format((1-len(stop_loss_occurrences_call)/len(odds_call))*100), fontsize=20)
+
+ticker='SPX'
+# plt.title(ticker+' Put Credit Spread PnL 2x stop-loss, number of option trades = ' + str(len(odds_put)) + ', win rate = ' + "{0:.2f}%".format((1-len(stop_loss_occurrences_put)/len(odds_put))*100)+',' +"{0:.2f}%".format((1-len(stop_loss_occurrences_call)/len(odds_call))*100), fontsize=20)
+plt.title(ticker+' Put Credit Spread PnL 2x stop-loss, number of option trades = ' + str(len(odds_put)) + ', win rate = ' + "{0:.2f}%".format((1-len(stop_loss_occurrences_put)/len(odds_put))*100), fontsize=20)
 # plt.title(ticker+' pnl, number of option trades = ' + str(len(odds_put)) + ', win rate = ' + "{0:.2f}%".format((1-len(stop_loss_occurrences_put)/len(odds_put))*100), fontsize=20)
-ax1.legend(['Stock', 'Option', 'Losing Trades'], loc='upper left', fontsize=15)
+ax1.legend(['SPY x100', 'Option', 'Losing Trades'], loc='upper left', fontsize=15)
 
 
 ax2 = plt.subplot(212)
@@ -84,12 +114,14 @@ ax2.yaxis.set_major_formatter('${x:1.0f}')
 ax2.tick_params(axis='x', labelsize=15)
 ax2.tick_params(axis='y', labelsize=15)
 ax2.plot(pd.to_datetime(bpe_analysis_put['trade_date']), number_of_trades * bpe_analysis_put['sum'], 'g')
-ax2.plot(pd.to_datetime(bpe_losing_put['trade_date']), number_of_trades*bpe_losing_put['sum'], '.g', markersize=10)
-
+ax2.plot(pd.to_datetime(bpe_losing_put['trade_date']), number_of_trades*bpe_losing_put['sum'], '.r', markersize=10)
+# ax2.plot(pd.to_datetime(bpe_analysis_call['trade_date']), number_of_trades * bpe_analysis_call['sum'], 'c')
+# ax2.plot(pd.to_datetime(bpe_losing_call['trade_date']), number_of_trades*bpe_losing_call['sum'], '.c', markersize=10)
 
 for days in holidays2016andon['holidays']:
     ax2.axvline(x=days, linestyle=":")
+# ax2.plot(pd.to_datetime(bpe_analysis_call['trade_date']), number_of_trades * bpe_analysis_call['sum'], 'red')
 ax2.spines['right'].set_visible(False)
 ax2.spines['top'].set_visible(False)
-ax2.legend(['Buying Power Effect', 'Losing Trades Put', '', 'Holidays'], loc='upper left', fontsize=15)
+ax2.legend(['Buying Power Effect', 'Losing Trades Put', 'Holidays'], loc='upper left', fontsize=15)
 
