@@ -2,7 +2,7 @@
 
 ## Strategy description
 
-We used our tool to backtest 7dte put creadit spread strategy on SPX. 
+We used our tool to backtest 7dte put creadit spread strategy on SPX. \n
 Days to expiration: 7
 Strategy: Put credit spread
 Actions:
