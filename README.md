@@ -11,7 +11,7 @@ Short leg: Sell one put contract at 10 delta and collect credit<br/>
 Long leg: but one put contract at 6 delta and pay debit<br/>
 
 Total Premium Collected (max profit) = short leg credit collected - long leg debit paid<br/>
-Stop loss criteria: Loss = 3x Total Premium Collected<br/>
+Stop loss criteria: Loss = 2x Total Premium Collected<br/>
 
 ## Result
 
