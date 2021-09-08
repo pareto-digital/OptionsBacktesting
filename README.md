@@ -1,4 +1,4 @@
-# Options Backtesting (partial code)
+# Options Backtesting (example)
 We used our tool to backtest 7dte put creadit spread strategy on SPX. 
 
 ![alt text](https://github.com/pareto-digital/OptionsBacktesting/blob/main/spx%20pcs%20vs%20spy%20example.png?raw=true)
