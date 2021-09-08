@@ -1,5 +1,15 @@
 # Options Backtesting (example)
 We used our tool to backtest 7dte put creadit spread strategy on SPX. 
+Days to expiration: 7
+Strategy: Put credit spread
+Actions:
+Short leg: Sell one put contract at 10 delta and collect credit
+Long leg: but one put contract at 6 delta and pay debit
+
+Total Premium Collected (max profit) = short leg credit collected - long leg debit paid
+Stop loss criteria: Loss = 3x Total Premium Collected
+
+## Results
 
 ![alt text](https://github.com/pareto-digital/OptionsBacktesting/blob/main/spx%20pcs%20vs%20spy%20example.png?raw=true)
 
