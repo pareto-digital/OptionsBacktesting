@@ -4,7 +4,7 @@
 
 We used our tool to backtest 7dte put creadit spread strategy on SPX. <br/>
 Days to expiration: 7<br/>
-Frequency: Weekly, 3 times/week since 2021 (SPX has contracts expired on Mon, Wed and Fri every week)
+Frequency: Weekly, 3 times/week since 2021 (SPX has contracts expired on Mon, Wed and Fri every week)<br/>
 Strategy: Put credit spread<br/>
 
 ### Actions:<br/>
