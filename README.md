@@ -8,6 +8,7 @@ Frequency: Weekly, 3 times/week since 2021 (SPX has contracts expired on Mon, We
 Strategy: Put credit spread<br/>
 
 ### Actions:<br/>
+Every Mon, Wed, Fri (excl. holidays when markets are closed), sell put credit spread that expires a week from then.<br/>
 Short leg: Sell one put contract at 10 delta and collect credit<br/>
 Long leg: but one put contract at 6 delta and pay debit<br/>
 
