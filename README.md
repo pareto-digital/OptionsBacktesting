@@ -2,7 +2,7 @@
 
 ## Strategy description
 
-We used our tool to backtest 7 DTE (Days To Expiration) put credit spread strategy on SPX. <br/>
+We backtested with our tool the 7 DTE (Days To Expiration) put credit spread strategy on SPX. <br/>
 Days to expiration: 7<br/>
 Frequency: Weekly, 3 times/week since 2021 (SPX has contracts expired on Mon, Wed and Fri every week)<br/>
 Strategy: Put credit spread<br/>
