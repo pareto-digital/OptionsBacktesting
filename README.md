@@ -2,7 +2,7 @@
 
 ## Strategy description
 
-We used our tool to backtest 7dte put creadit spread strategy on SPX. <br/>
+We used our tool to backtest 7dte (days to expiration) put credit spread strategy on SPX. <br/>
 Days to expiration: 7<br/>
 Frequency: Weekly, 3 times/week since 2021 (SPX has contracts expired on Mon, Wed and Fri every week)<br/>
 Strategy: Put credit spread<br/>
@@ -10,7 +10,7 @@ Strategy: Put credit spread<br/>
 ### Actions:<br/>
 Every Mon, Wed, Fri (excl. holidays when markets are closed), sell put credit spread that expires a week from then.<br/>
 Short leg: Sell one put contract at 10 delta and collect credit<br/>
-Long leg: but one put contract at 6 delta and pay debit<br/>
+Long leg: buy one put contract at 6 delta and pay debit<br/>
 
 Total Premium Collected (max profit) = short leg credit collected - long leg debit paid<br/>
 Stop loss criteria: Loss = 2x Total Premium Collected<br/>
