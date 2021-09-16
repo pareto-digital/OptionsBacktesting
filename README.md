@@ -1,7 +1,8 @@
 # Options Backtesting <br/>
 Chart below shows results from 2016-2021, however, repo only contains data snippet from 2021. <br/>
-Viwers can test with (1) any days to expiration <= 7 (ln 24, mainprg.py) and <br/>
-(2) different combinations of delta (ln 28-29, mainprg.py, delta>0 & delta<1) 
+Viwers can test with (1) any days to expiration <= 7 (ln 24, mainprg.py), <br/>
+(2) different combinations of delta (ln 28-29, mainprg.py, delta>0 & delta<1), and <br/>
+(3) stop-loss criteria (ln 40, mainprg.py)
 
 ## Strategy description
 
