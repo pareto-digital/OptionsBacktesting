@@ -1,4 +1,5 @@
-# Options Backtesting (example from 2016-2021, repo data only covers 2021)
+# Options Backtesting <br/>
+Example chart below shows results from 2016-2021, repo only contains data from 2021 so that viwers can test the code
 
 ## Strategy description
 
