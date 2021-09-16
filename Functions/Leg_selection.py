@@ -104,7 +104,7 @@ def trim_leg(leg_pnl_df, otype, side='short'):
         side:
 
     Returns:
-
+        trimmed pnl data with only necessary data to save memory
     """
     leg_pnl_trimmed = leg_pnl_df[['ticker', 'expirdate', side+'_date_transact', 'strike', side+'_delta_transact',
                                   side+otype+'value_transact', otype[1]+'value', 'delta', 'trade_date', 'days_to_expir',
