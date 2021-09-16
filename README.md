@@ -1,4 +1,4 @@
-# Options Backtesting (example)
+# Options Backtesting (example from 2016-2021, repo data only covers 2021)
 
 ## Strategy description
 
