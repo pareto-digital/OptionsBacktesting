@@ -1,7 +1,7 @@
 # Options Backtesting <br/>
 Example chart below shows results from 2016-2021, repo only contains data from 2021. <br/>
 Viwers can test with (1) any days to expiration <= 7 (ln 24, mainprg.py) and <br/>
-(2) different combinations of delta (mainprg.py, ln 28-29, delta>0 & delta<1) 
+(2) different combinations of delta (ln 28-29, mainprg.py, delta>0 & delta<1) 
 
 ## Strategy description
 
