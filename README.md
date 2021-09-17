@@ -1,4 +1,6 @@
 # Options Backtesting <br/>
+Please visit www.odds.trade and sign up for Odds, the first social trading platform specialized for options trading. <br/>
+
 Chart below shows results from 2016-2021, however, repo only contains data snippet from 2021. <br/>
 Viwers can test with: <br/>
 (1) any days to expiration <= 7 (ln 24, mainprg.py), <br/>
