@@ -32,5 +32,5 @@ We compare this strategy with holding 100 shares of SPY. The purchasing cost was
 
 The options strategy is strictly better than buy&hold 100 shares SPY. <br/>
 
-Please visit www.odds.trade and learn more about us.
+Please visit www.odds.trade to learn more about us.
 
